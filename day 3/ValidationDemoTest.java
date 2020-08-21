@@ -1,0 +1,70 @@
+ import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
+
+public class ValidationDemoTest {
+    private WebDriver driver;
+    private WebDriverWait wait;
+
+    private String baseUrl = "http://demo.guru99.com/V1/index.php";
+
+    @BeforeClass
+    public void RunTest() {
+        driver = ChromeDriverFactory.initCD();
+        wait = new WebDriverWait(driver, 10, 0);
+        driver.get(baseUrl);
+    }
+
+    @Test
+    public void TestTest()
+        {
+            WebElement usernameControl = driver.findElement(By.name("uid"));
+            WebElement passwordControl = driver.findElement(By.name("password"));
+            WebElement body = driver.findElement(By.cssSelector("body"));
+            WebElement userValidationMessage = driver.findElement(By.id("message23"));
+            WebElement passwordValidationMessage = driver.findElement(By.id("message18"));
+
+            checkStyleBeforeClicking(userValidationMessage);
+            checkStyleBeforeClicking(passwordValidationMessage);
+            checkStyleAfterClicking(passwordControl, passwordValidationMessage, usernameControl);
+            checkStyleAfterClicking(usernameControl, userValidationMessage, passwordControl);
+            checkStyleAfterFilling(usernameControl, userValidationMessage);
+            checkStyleAfterFilling(passwordControl, passwordValidationMessage);
+        }
+
+        @AfterClass
+        public void closeBrowser() {
+            driver.quit();
+        }
+        private void checkStyleBeforeClicking(WebElement checkingElement){
+        String expectedStyle = "";
+        String actualStyle = checkingElement.getAttribute("style");
+
+        Assert.assertEquals(actualStyle, expectedStyle);
+    }
+
+
+    private void checkStyleAfterClicking(WebElement interactionElement, WebElement checkingElement, WebElement missClick){
+        interactionElement.click();
+        missClick.click();
+
+
+        String expectedStyle = "visibility: visible;";
+        String actualStyle = checkingElement.getAttribute("style");
+        Assert.assertEquals(actualStyle, expectedStyle);
+
+    }
+
+    private void checkStyleAfterFilling(WebElement interactionElement, WebElement checkingElement){
+        interactionElement.sendKeys("a");
+
+        String expectedStyle = "visibility: hidden;";
+        String actualStyle = checkingElement.getAttribute("style");
+        Assert.assertEquals(actualStyle, expectedStyle);
+    }
+}
